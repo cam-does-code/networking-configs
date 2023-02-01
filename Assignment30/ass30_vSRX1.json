@@ -15,7 +15,7 @@ interfaces {
     ge-0/0/0 {
         unit 0 {
             family inet {
-                address 10.56.16.80/22; /* IP adressen der forbinder routeren til VMnet8 i Workstation */
+                address 10.56.16.80/22; /* IP-adressen der forbinder routeren til VMnet8 i Workstation */
             }
         }
     }
@@ -36,7 +36,7 @@ interfaces {
 }
 routing-options {
     static {
-        route 0.0.0.0/0 next-hop 10.56.16.1; /* Default Route */
+        route 0.0.0.0/0 next-hop 10.56.16.1; /* Default Route – Her indstilles det at alle pakker som har en destinations IP som ikke kendes i routerens routetabel, videresendes til adressen 10.56.16.1, altså VMnet8 */
     }
 }
 security {
@@ -100,7 +100,7 @@ security {
         }
     }
     zones {
-        security-zone trust { /* Her oprettes zonen 'trust' og de 2 subnets tilføjes. Dette er zonen vi betegner som sikker */
+        security-zone trust { /* Her oprettes zonen 'trust' og de 2 interfaces der anvendes til subnets tilføjes. Dette er zonen vi betegner som sikker */
             interfaces {
                 ge-0/0/1.0 {
                     host-inbound-traffic {
@@ -118,7 +118,7 @@ security {
                 }
             }
         }
-        security-zone untrust {/* Her oprettes zonen 'untrust' og routen til internettet tilføjes. Dette er zonen vi betegner som usikker */
+        security-zone untrust {/* Her oprettes zonen 'untrust' og interfacet der benyttes til at forbinde til internettet tilføjes. Dette er zonen vi betegner som usikker */
             interfaces {
                 ge-0/0/0.0 {
                     host-inbound-traffic {
