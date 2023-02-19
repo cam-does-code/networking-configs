@@ -1,0 +1,107 @@
+## Legacy DHCP Configuration
+/* By Benny Nielsen & Camilla Bartell */
+version 12.1X47-D15.4;
+system {
+    host-name vSRX_2;
+    /* pass = Rootpass */
+    root-authentication {
+        encrypted-password "$1$Z3YQht9Z$BZKYMEvOsYIoM.uFNtKFf1"; ## SECRET-DATA
+    }
+    services {
+        ssh;
+        dhcp { /* Legacy konfiguration */
+            /* Subnet 3 */
+            pool 192.168.3.0/24 {
+                address-range low 192.168.3.30 high 192.168.3.39;
+                name-server 8.8.8.8;
+                router 192.168.3.1;
+                default-lease-time 600; /* seconds. 600 for test! */
+            }
+            /* Subnet 4 */
+            pool 192.168.4.0/24 {
+                address-range low 192.168.4.40 high 192.168.4.49;
+                name-server 8.8.8.8;
+                router 192.168.4.1;
+                default-lease-time 600; /* seconds. 600 for test! */
+            }
+        }
+    }
+}
+interfaces {
+    ge-0/0/0 { /* Subnet 5 - Forbindelsen mellem R1 og R2 */
+        unit 0 {
+            family inet {
+                address 10.10.10.2/24;
+            }
+        }
+    }
+    ge-0/0/1 {/* Subnet 3 */
+        unit 0 {
+            family inet {
+                address 192.168.3.1/24;
+            }
+        }
+    }
+    ge-0/0/2 {/* Subnet 4 */
+        unit 0 {
+            family inet {
+                address 192.168.4.1/24;
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        route 192.168.1.0/24 next-hop 10.10.10.1;
+        route 192.168.2.0/24 next-hop 10.10.10.1;
+    }
+}
+security {
+    policies {
+        from-zone trust to-zone trust {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone trust {
+            tcp-rst;
+            interfaces {
+                ge-0/0/1.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                            ssh;
+                            dhcp; /* Interfacet tildeles adgang til DHCP-serveren */
+                        }
+                    }
+                }
+                ge-0/0/2.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                            ssh;
+                            dhcp; /* Interfacet tildeles adgang til DHCP-serveren */
+                        }
+                    }
+                }
+                ge-0/0/0.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+            }
+        }
+        security-zone untrust;
+    }
+}
