@@ -57,31 +57,16 @@ security {
     }
     zones {
         security-zone trust {
-            tcp-rst;
             interfaces {
-                ge-0/0/1.0 {
-                    host-inbound-traffic {
-                        system-services {
-                            ping;
-                        }
-                    }
-                }
-                ge-0/0/2.0 {
-                    host-inbound-traffic {
-                        system-services {
-                            ping;
-                        }
-                    }
-                }
-                ge-0/0/0.0 {
-                    host-inbound-traffic {
-                        system-services {
-                            ping;
-                        }
-                    }
+                ge-0/0/0.0;
+                ge-0/0/1.0;
+                ge-0/0/2.0;
+            }
+            host-inbound-traffic {
+                system-services {
+                        ping;
                 }
             }
         }
-        security-zone untrust;
     }
 }
