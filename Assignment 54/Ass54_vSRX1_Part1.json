@@ -1,0 +1,87 @@
+## Last changed: 2022-12-19 13:36:46 UTC
+version 12.1X47-D15.4;
+/* By Benny Nielsen & Camilla Bartell */
+system {
+    host-name vSRX_1;
+    /* pass = Rootpass */
+    root-authentication {
+        encrypted-password "$1$AieEmYzR$qg87iKhyZce4dGF2uWpyy1"; ## SECRET-DATA
+    }
+    services {
+        ssh;
+    }
+}
+interfaces {
+    ge-0/0/0 {
+        unit 0 {
+            family inet {
+                address 10.10.10.1/24;
+            }
+        }
+    }
+    ge-0/0/1 {
+        unit 0 {
+            family inet {
+                address 192.168.1.1/24;
+            }
+        }
+    }
+    ge-0/0/2 {
+        unit 0 {
+            family inet {
+                address 192.168.2.1/24;
+            }
+        }
+    }
+}
+routing-options {
+    static {
+        route 192.168.3.0/24 next-hop 10.10.10.2;
+        route 192.168.4.0/24 next-hop 10.10.10.2;
+    }
+}
+security {
+    policies {
+        from-zone trust to-zone trust {
+            policy default-permit {
+                match {
+                    source-address any;
+                    destination-address any;
+                    application any;
+                }
+                then {
+                    permit;
+                }
+            }
+        }
+    }
+    zones {
+        security-zone trust {
+            tcp-rst;
+            interfaces {
+                ge-0/0/1.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+                ge-0/0/2.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+                ge-0/0/0.0 {
+                    host-inbound-traffic {
+                        system-services {
+                            ping;
+                        }
+                    }
+                }
+            }
+        }
+        security-zone untrust;
+    }
+}
